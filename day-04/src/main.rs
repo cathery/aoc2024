@@ -36,8 +36,8 @@ fn main() {
     let mut finds = 0;
     let mut finds2 = 0;
 
-    for (column, line) in lines.enumerate() {
-        for (row, character) in line.char_indices() {
+    for (row, line) in lines.enumerate() {
+        for (column, character) in line.char_indices() {
 
             /////////////////////
             //// PART 1
@@ -53,14 +53,14 @@ fn main() {
 
                 if word_match.count == 1 {
                     // for the first letter, we want any adjacent letters
-                    if row.abs_diff(word_match.start.x) > 1 || column.abs_diff(word_match.start.y) > 1 {
+                    if column.abs_diff(word_match.start.x) > 1 || row.abs_diff(word_match.start.y) > 1 {
                         continue;
                     }
                 }
                 else {
                     // for 2+ letters we want a matching direction
-                    if row != ((word_match.start.x as i32) + ((word_match.direction.x as i32) * (word_match.count as i32))) as usize
-                    || column != ((word_match.start.y as i32) + ((word_match.direction.y as i32) * (word_match.count as i32))) as usize {
+                    if column != ((word_match.start.x as i32) + ((word_match.direction.x as i32) * (word_match.count as i32))) as usize
+                    || row != ((word_match.start.y as i32) + ((word_match.direction.y as i32) * (word_match.count as i32))) as usize {
                         continue;
                     }
                 }
@@ -82,7 +82,7 @@ fn main() {
                     new_matches.push(WordMatch {
                         reverse: word_match.reverse,
                         start: Point{x: word_match.start.x, y: word_match.start.y},
-                        direction: Point {x: ((row as i32) - (word_match.start.x as i32)) as i8, y: ((column as i32) - (word_match.start.y as i32)) as i8},
+                        direction: Point {x: ((column as i32) - (word_match.start.x as i32)) as i8, y: ((row as i32) - (word_match.start.y as i32)) as i8},
                         count: word_match.count + 1
                     });
 
@@ -107,7 +107,7 @@ fn main() {
             if character == pattern1[0] || character == pattern1[pattern1.len() - 1] {
                 matches.push(WordMatch {
                     reverse: character != pattern1[0],
-                    start: Point{x: row, y: column},
+                    start: Point{x: column, y: row},
                     direction: Point{x: 0, y: 0},
                     count: 1,
                 });
@@ -126,18 +126,18 @@ fn main() {
                 }
 
                 // determine the flow of the right-to-left word
-                if row == cross_match.start.x + pattern2.len() - 1
-                && column == cross_match.start.y {
+                if column == cross_match.start.x + pattern2.len() - 1
+                && row == cross_match.start.y {
                     cross_match.reverse_right = character != pattern2[0];
                 }
 
                 // check if the current position matches the X pattern
                 for count in 1..=pattern2.len() {
 
-                    if column == cross_match.start.y + count - 1 {
+                    if row == cross_match.start.y + count - 1 {
 
                         // search for next left-to-right letter
-                        if row == cross_match.start.x + count - 1 {
+                        if column == cross_match.start.x + count - 1 {
                             // if the character doesn't match, fail immediately
                             if cross_match.reverse_left && character != pattern2[pattern2.len() - count]
                             || !cross_match.reverse_left && character != pattern2[count - 1] {
@@ -154,7 +154,7 @@ fn main() {
                         }
 
                         // search for next right-to-left letter
-                        if row == cross_match.start.x + pattern2.len() - count {
+                        if column == cross_match.start.x + pattern2.len() - count {
                             // if the character doesn't match, fail immediately
                             if cross_match.reverse_right && character != pattern2[pattern2.len() - count]
                             || !cross_match.reverse_right && character != pattern2[count - 1] {
@@ -172,7 +172,7 @@ fn main() {
                 cross_matches.push(CrossMatch {
                     reverse_left: character != pattern2[0],
                     reverse_right: false,
-                    start: Point{x: row, y: column},
+                    start: Point{x: column, y: row},
                     failed: false,
                 });
             }
